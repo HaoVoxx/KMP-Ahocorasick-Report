@@ -1,0 +1,496 @@
+\section{Knuth - Morris - Pratt Step by step}
+\textbf{Note}: The string will start at number 0
+
+\subsection{Problem}
+\begin{itemize}
+    \item Given string s: "ABXABABABAA".
+    \item Given string t: "ABABAA".
+\end{itemize}
+
+Check if string t exists in string s?
+
+\subsection{Main idea}
+
+The idea behind KMP is to extend a suffix ending at position i to a suffix ending at position i+1 while still matching the corresponding prefix, which improves efficiency by eliminating expensive string comparisons. \cite{vnoi}
+
+
+\subsection{Definition}
+\begin{itemize}
+    \item \textbf{Proper Prefix}: A prefix that is not equal to the string itself.
+
+    \item \textbf{Prefix Function}\cite{cpAlgo}: An array $\pi$ of length m, where $\pi[i]$ is the length of the longest proper prefix of the substring $s[0..i]$, which is also a suffix of the substring. Mathematically, the definition of the prefix function can be written as follows:
+\end{itemize}
+\begin{equation}
+    \pi[i] = \max_{0 \le k \le i} \{\,k : s[0 \dots k-1] = s[i-(k-1) \dots i]\}.
+\end{equation}
+
+\subsection{Preprocessing}
+Due to the definition of proper prefix, $\pi[0] = 0$.
+
+Here is the example code:
+\lstinputlisting[language=C++]{code/Preprocessing.cpp}
+The example code will run in $\Theta(m)$ where m is the length of the pattern.
+    \subsection *{Explain step by step}
+    \textbf{Step 1: }$\pi[0] = 0$ so $i$ starts at 1. We use $j$ to trace the prefix, and it starts at 0:
+
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   & j & i &   &   &   &   \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 &   &   &   &   &   \\ \hline
+    \end{tabular}
+    \end{table}
+    
+    \textbf{Step 2: }\textit{At $i = 1$ and $j = 0$}
+    
+    $t[i]$ mismatches $t[j]$ ("A" $\neq$ "B"), so we set $\pi[i = 1] = 0$ then increases $i$ by 1:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   & $j$ &   & $i$ &   &   &   \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 &   &   &   &   \\ \hline
+    \end{tabular}
+    \end{table}
+
+    \textbf{Step 3: }\textit{At $i = 2$ and $j = 0$}
+    
+    $t[i]$ matches $t[j]$ ("A" $=$ "A"), so we set $\pi[i = 2] = j + 1 = 1$ then increases both $i$ and $j$ by 1:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   &   & $j$ &   & $i$ &   &   \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 &   &   &   \\ \hline
+    \end{tabular}
+    \end{table}
+    \textbf{Note}: $\pi[i] = j + 1$ because $\pi[i]$ represents the length of the longest proper prefix of the substring $t[0\dots i]$, which is also a suffix of the substring.
+    
+    \textbf{Step 4: }\textit{At $i = 3$ and $j = 1$}
+    
+    $t[i]$ matches $t[j]$ ("B" $=$ "B"), so we set $\pi[i = 3] = j + 1 = 2$ then increases both $i$ and $j$ by 1:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   &   &   & $j$ &   & $i$ &   \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 & 2 &   &   \\ \hline
+    \end{tabular}
+    \end{table}
+    \textbf{Step 5: }\textit{At $i = 4$ and $j = 2$}
+    
+    $t[i]$ matches $t[j]$ ("A" $=$ "A"), so we set $\pi[i = 4] = j + 1 = 3$ then increases both $i$ and $j$ by 1:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   &   &   &   & $j$ &   & $i$ \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 & 2 & 3 &   \\ \hline
+    \end{tabular}
+    \end{table}
+    \textbf{Step 6: }\textit{At $i = 5$ and $j = 3$} 
+    
+    $t[i]$ mismatches $t[j]$ ("B" $\neq$ "A") and j is greater than 0. This situation is a bit tricky because we must trace back to the $\pi[j - 1]$ position. Since $\pi[i]$ represents the longest proper prefix of $s[0\dots i]$, $\pi[i - 1]$ represents the second longest proper prefix and so on. Therefore, if there is a mismatch, we have to trace back to the second, third, etc., longest proper prefix. In this case, $j$ moves to position 1 because $\pi[j - 1] = 1$:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   &   & $j$ &   &   &   & $i$ \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 & 2 & 3 &   \\ \hline
+    \end{tabular}
+    \end{table}
+    \textbf{Step 7: }Now, $t[i]$ and $t[j]$ still do not match, and $j$ is still greater than 0, so we repeat the backtracking step. As a result, $j$ goes back to $0$ because $\pi[j - 1] = 0$:
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    pos   & $j$ &   &   &   &   & $i$ \\ \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 & 2 & 3 &   \\ \hline
+    \end{tabular}
+    \end{table}
+    \textbf{Step 8: }Now, $t[i]$ and $t[j]$ match ("A" $=$ "A") so we set $\pi[i] = j + 1 = 1$ and done the prefix function.
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    t     & A & B & A & B & A & A \\ \hline
+    $\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+    \end{tabular}
+    \end{table}
+
+    \textbf{Important}: The code always runs in linear time regardless of the string's distribution. Therefore, the time and space complexity of the code is $\Theta(m)$, where m is the length of the pattern string.
+\subsection{String matching}
+
+After computing the prefix function for the pattern \( t \), we use it to efficiently search for \( t \) in the text \( s \). Recall that for \( t = \texttt{ABABAA} \), the prefix function is:
+\[
+\pi = [0,\, 0,\, 1,\, 2,\, 3,\, 1].
+\]
+
+The string matching algorithm proceeds as follows:
+
+\begin{enumerate}
+    \item Initialize two indices: \( i \) for the text \( s \) (starting at 0) and \( j \) for the pattern \( t \) (starting at 0).
+    \item Compare \( s[i] \) with \( t[j] \):
+    \begin{itemize}
+        \item If \( s[i] = t[j] \), increment both \( i \) and \( j \).
+        \item If \( s[i] \neq t[j] \) and \( j > 0 \), update \( j \) to \( \pi[j-1] \) (i.e., backtrack \( j \) to the length of the next best candidate prefix) and compare again.
+        \item If \( s[i] \neq t[j] \) and \( j = 0 \), increment \( i \) only.
+    \end{itemize}
+    \item If \( j \) reaches the length of \( t \) (i.e., \( j = m \) where \( m \) is the length of \( t \)), a full match is found at index \( i - j \) in \( s \).
+\end{enumerate}
+
+\subsection*{Example Walk-through}
+Consider the given strings:
+\begin{itemize}
+    \item \( s = \texttt{ABXABABABAA} \)
+    \item \( t = \texttt{ABABAA} \)
+\end{itemize}
+\textbf{Step 1: }\textit{Start with i = 0 and j = 0}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &$i$&   &   &   &   &   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   & $j$ &   &   &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[0] = $ \texttt{A} and $t[0] = $ \texttt{A} $\longrightarrow$ match, so increment: $i = 1$, $j = 1$.
+
+\textbf{Step 2: }\textit{Now, $i = 1$ and $j = 1$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &$i$&   &   &   &   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   & $j$ &   &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[1] = $ \texttt{B} and $t[1] = $ \texttt{B} $\longrightarrow$ match, so increment: $i = 2$, $j = 2$.
+
+\textbf{Step 3: }\textit{Now, $i = 2$ and $j = 2$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &$i$&   &   &   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   & $j$ &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[2] = $ \texttt{X} and $t[2] = $ \texttt{A} $\longrightarrow$ mismatch.
+
+Since $j > 0$, update $j$ to $\pi[j - 1] = \pi[1] = 0$.
+
+\textbf{Step 4: }\textit{Now, $i = 2$ and $j = 0$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &$i$&   &   &   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   & $j$ &   &   &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[2] = $ \texttt{X} and $t[0] = $ \texttt{A} $\longrightarrow$ mismatch.
+
+But now $j = 0$, so increment: $i = 3$.
+
+\textbf{Step 5: }\textit{Now, $i = 3$ and $j = 0$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &$i$&   &   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   & $j$ &   &   &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[3] = $ \texttt{A} and $t[0] = $ \texttt{A} $\longrightarrow$ match, so increment: $i = 4$, $j = 1$.
+
+\textbf{Step 6: }\textit{Now, $i = 4$ and $j = 1$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &$i$&   &   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   & $j$ &   &   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[4] = $ \texttt{B} and $t[1] = $ \texttt{B} $\longrightarrow$ match, so increment: $i = 5$, $j = 2$.
+
+\textbf{Step 7: }\textit{Now, $i = 5$ and $j = 2$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &$i$&   &   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &$j$&   &   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[5] = $ \texttt{A} and $t[2] = $ \texttt{A} $\longrightarrow$ match, so increment: $i = 6$, $j = 3$.
+
+\textbf{Step 8: }\textit{Now, $i = 6$ and $j = 3$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &$i$&   &   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &$j$&   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[6] = $ \texttt{B} and $t[3] = $ \texttt{B} $\longrightarrow$ match, so increment: $i = 7$, $j = 4$.
+
+\textbf{Step 9: }\textit{Now, $i = 7$ and $j = 4$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &   &$i$&   &   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &$j$&   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[7] = $ \texttt{A} and $t[4] = $ \texttt{A} $\longrightarrow$ match, so increment: $i = 8$, $j = 5$.
+
+\textbf{Step 10: }\textit{Now, $i = 8$ and $j = 5$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &   &   &$i$&   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &$j$\\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[8] = $ \texttt{B} and $t[5] = $ \texttt{A} $\longrightarrow$ mismatch.
+
+Since $j > 0$, update $j$ to $\pi[j - 1] = \pi[4] = 3$.
+
+\textbf{Step 11: }\textit{Now, $i = 8$ and $j = 3$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &   &   &$i$&   &   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &$j$&   &   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[8] = $ \texttt{B} and $t[3] = $ \texttt{B} $\longrightarrow$ match, so increment: $i = 9$, $j = 4$.
+
+\textbf{Step 12: }\textit{Now, $i = 9$ and $j = 4$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &   &   &   &$i$&   \\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &$j$&   \\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[9] = $ \texttt{A} and $t[4] = $ \texttt{A} $\longrightarrow$ match, so increment: $i = 10$, $j = 5$.
+
+\textbf{Step 13: }\textit{Now, $i = 10$ and $j = 5$}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &   &   &   &   &   &$i$\\ \hline
+s     & A & B & X & A & B & A & B & A & B & A & A \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+pos   &   &   &   &   &   &$j$\\ \hline
+t     & A & B & A & B & A & A \\ \hline
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 1 \\ \hline
+\end{tabular}
+\end{table}
+
+$s[10] = $ \texttt{A} and $t[5] = $ \texttt{A} $\longrightarrow$ match.
+
+Since $j = m$ where m is the length of t, a full match is found at index $i - j = 5^{th}$ in $s$.
+
+Here is the full code of String Matching:
+\lstinputlisting[language=C++]{code/StringMatching.cpp}
+
+The overall complexity of this string matching process is \( \mathcal{O}(n + m) \), where \( n \) is the length of the text \( s \) and \( m \) is the length of the pattern \( t \).
+
+\subsection{Complexity Analysis}
+\begin{itemize}
+    \item The total \textbf{Space Complexity} of the algorithm is $\Theta(m)$, due to the contruction of $\pi$ length m.
+    \item However, the \textbf{Time Complexity} of the algorithm depends on the kind of problem:
+    \begin{itemize}
+        \item Find all the position that string pattern $t$ occurs in string text $s$.
+        \item Return the first string pattern $t$ occurs in string text $s$ or Check if string pattern $t$ occurs in string text or not.
+    \end{itemize}
+\end{itemize}
+\subsection*{Find all the position}
+\begin{itemize}
+    \item In this problem, we must agree that the \textbf{Preprocessing} step always runs in $\Theta(m)$ because it always iterates through pattern $t$.
+    \item In \textbf{String Matching} step, we also iterate through string $s$ to find all the position that appears pattern $t$. So the time complexity is $\Theta(n)$.
+\end{itemize}
+$\Longrightarrow$ The total \textbf{Time Complexity} is $\Theta(n + m)$
+\subsection*{Check if occurs or not}
+\begin{itemize}
+    \item In this problem, we must agree that the \textbf{Preprocessing} step always runs in $\Theta(m)$ because it always iterates through pattern $t$.
+    \item In \textbf{String Matching} step, it happens 2 cases:
+    \begin{itemize}
+        \item \textbf{Best Case:} We instantly find the pattern $t$ at the prefix of the string $s$.
+        \item \textbf{Worst Case:} We find the pattern $t$ at the suffix of the string $s$.
+    \end{itemize}
+\end{itemize}
+$\Longrightarrow$ The \textbf{Time Complexity} of the algorithm is:
+\begin{itemize}
+    \item \textbf{Best Case:} $\mathcal{O}(m)$.
+    \item \textbf{Worst Case: } $\mathcal{O}(n + m)$.
+\end{itemize}

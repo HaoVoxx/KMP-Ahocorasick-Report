@@ -1,0 +1,15 @@
+\section{History and Applications of the Knuth-Morris-Pratt (KMP) Algorithm}
+\subsection{History}
+The Knuth-Morris-Pratt (KMP) algorithm was developed by Donald Knuth, Vaughan Pratt, and James H. Morris in 1970 and was officially published in 1977. The KMP algorithm provides an efficient method for locating a substring $W$ within a larger string $S$. Instead of re-examining previously matched characters upon encountering a mismatch, the KMP algorithm leverages information inherent in the pattern $W$ itself to determine the next position for comparison.
+
+One of the key advantages of the KMP algorithm is its high efficiency. It operates with a time complexity of $O(n+m)$, where $n$ is the length of the text $S$ and $m$ is the length of the pattern $W$. Furthermore, by utilizing the Longest Prefix Suffix (LPS) table, the algorithm eliminates redundant comparisons, thereby optimizing search performance. The KMP algorithm represents a significant improvement over conventional brute-force search methods, making it particularly beneficial when processing large datasets or executing repeated search operations.
+
+\subsection{Applications}
+\begin{itemize}
+    \item Text searching: Implemented in text editors (such as Microsoft Word, Notepad++) to locate words or phrases within documents.
+    \item Pattern matching in DNA and computational biology: Applied in genetic research to identify specific gene sequences within extensive DNA datasets.
+    \item Spam filtering: Used to detect suspicious keywords in emails, aiding in the identification of spam messages.
+    \item Search engines: Enhances search efficiency by facilitating substring searches within large-scale databases.
+    \item Plagiarism detection: Compares textual documents to identify duplicated content, assisting in academic integrity verification.
+    \item File processing and compilation: Employed in certain compilers to efficiently analyze and parse source code.
+\end{itemize}

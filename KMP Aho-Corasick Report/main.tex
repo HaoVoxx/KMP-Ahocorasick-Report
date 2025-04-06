@@ -1,0 +1,71 @@
+\documentclass{article}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{lscape}
+\usepackage{graphicx}
+\usepackage{hcmus-report-template}
+\usepackage{tikz}  
+% \usetikzlibrary{graphdrawing.trees}
+
+\usetikzlibrary{arrows, positioning, shapes.multipart}
+\usepackage{eso-pic}
+\usetikzlibrary{calc,decorations.pathmorphing}
+% Disable indentation on new paragraphs
+\setlength{\parindent}{0pt}
+
+% Line spacing 1.5
+\renewcommand{\baselinestretch}{1.5}
+
+% Optional: graphic path
+% \graphicspath{PATH_TO_GRAPHIC_FOLDER}
+
+% To use Times font family, uncomment this row
+% \usepackage{mathptmx}
+
+% To use roman section / subsection, uncomment these rows
+% \renewcommand{\thesection}{\Roman{section}}
+% \renewcommand{\thesubsection}{\thesection.\Roman{subsection}}
+
+% Define course name, report name and report title.
+\newcommand{\coursename}{Data Structures and Algorithms}
+\newcommand{\reportname}{String Algorithms}
+\newcommand{\reporttitle}{KMP and Aho-Corasick}
+
+\newcommand{\studentname}{Võ Đình Cao Minh Hào (24127035)\\Trịnh Duy Nhân (24127094)\\Phan Thanh Trúc Quân (24127227)}
+\newcommand{\teachername}{Dr. Nguyễn Ngọc Thảo \\ BSc. Nguyễn Thanh Tình}
+
+% Header
+\lhead{\reporttitle}
+\rhead{
+VNUHCM - University of Science\\
+\coursename
+}
+
+% Footer
+\newcommand{\leftfooter}{Report in \LaTeX\ by \href{https://github.com/HaoVoxx/Group-8-Course-Project}{Group 8}}
+\lfoot{\leftfooter}
+
+% ============ DOCUMENT ============
+\begin{document}
+\include{title}
+\pagenumbering{roman}
+\input{content/title.tex}
+
+\tableofcontents
+\pagebreak
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{content/bg_KMP}
+\input{content/KMP}
+\input{content/bg_Aho}
+\input{content/aho-corasuck}
+\input{content/similarities and dissimilarities}
+\input{content/Team Progress}
+\input{content/Video}
+\input{ref/ref}
+\end{document}
+
+
+
